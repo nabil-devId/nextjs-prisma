@@ -80,15 +80,19 @@ export default function Home(props) {
   }
 
   return (
-    <div>
+    <div style={{width: '100%', paddingLeft: 200, paddingRight: 200, paddingTop: 50}}>
         <input type="text" onChange={(e) => setMahasiswa(e.target.value)}/>
+        <br/>
         <select name="jurusan" id="jurusan" onChange={jurusanOnChange} defaultValue={props.jurusan[0]??null}>
             {props.jurusan.map(jurusan2 => <option key={jurusan2.id} value={jurusan2.id}>{jurusan2.namaJurusan}</option>)}
         </select>
+        <br/>
         <button onClick={createMahasiswa}>Add mahasiswa</button>
-
+        <hr/>
         <input type="text" onChange={(e) => setJurusan(e.target.value)}/>
+        <br/>
         <button onClick={() => createJurusan()}>Add Jurusan</button>
+        <br/>
         <h1>Mahasiswa</h1>
         <ul>
             {props.mahasiswa.map(mahasiswa => <li key={mahasiswa.idUser}>{mahasiswa.nama} - {mahasiswa.jurusan.namaJurusan} <a href="#" style={{color: 'blue'}} onClick={() => deleteMahasiswa(mahasiswa.idUser)}>Delete</a></li>)}
