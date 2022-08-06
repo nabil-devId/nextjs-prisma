@@ -11,16 +11,17 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
+
+model Jurusan {
+  id        Int     @id @default(autoincrement())
+  namaJurusan     String
+  mahasiswa    Mahasiswa[]
+}
+
 model Mahasiswa {
   idUser    Int     @id @default(autoincrement())
   email String  @unique
   nama  String?
   jurusan Jurusan @relation(fields: [jurusanId], references: [id])
   jurusanId Int
-}
-
-model Jurusan {
-  id        Int     @id @default(autoincrement())
-  namaJurusan     String
-  mahasiswa    Mahasiswa[]
 }

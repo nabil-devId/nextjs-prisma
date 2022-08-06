@@ -11,7 +11,7 @@ export default async function handler(req, res) {
             data: {
                 email: mahasiswa + '@email.com',
                 nama: mahasiswa,
-                jurusanId: jurusan
+                jurusanId: jurusan.id
             }
         });
         res.json(result);

@@ -7,11 +7,15 @@ const addMahasiswaFunc = async () => {
 
 }
 export default function Home(props) {
-    console.log(props);
   const [mahasiswa, setMahasiswa] = useState('');
   const router = useRouter();
-  const [jurusan, setJurusan] = useState(props.jurusan[0]?.id);
+  const [jurusan, setJurusan] = useState(props.jurusan[0]?? null);
+  const [loading, setLoading] = useState(false);
+  if (loading){
+      return <div>Loading...</div>;
+  }
   const createMahasiswa = async () =>{
+      setLoading(true);
       try {
           await fetch('/api/mahasiswa', {
               method: 'POST',
@@ -19,11 +23,14 @@ export default function Home(props) {
               body: JSON.stringify({mahasiswa, jurusan}),
           });
           await router.replace(router.asPath);
+          await setLoading(false);
       } catch (error) {
+          setLoading(false);
           console.error(error);
       }
   }
     const createJurusan = async () =>{
+        setLoading(true);
         try {
             await fetch('/api/jurusan', {
                 method: 'POST',
@@ -31,26 +38,52 @@ export default function Home(props) {
                 body: JSON.stringify({jurusan: jurusan}),
             });
             await router.replace(router.asPath);
+            await setLoading(false);
         } catch (error) {
+            setLoading(false);
             console.error(error);
         }
     }
     const deleteMahasiswa = async id =>{
+        setLoading(true);
         try {
             await fetch('/api/mahasiswa/' + id, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
             });
             await router.replace(router.asPath);
+            await setLoading(false);
         } catch (error) {
+            setLoading(false);
             console.error(error);
         }
     }
+
+    const jurusanOnChange = e => {
+        const data = props.jurusan.find(jrsn => jrsn.id === parseInt(e.target.value));
+        setJurusan(data);
+    }
+
+  const deleteJurusan = async id => {
+      setLoading(true);
+      try {
+          await fetch('/api/jurusan/' + id, {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+          });
+          await router.replace(router.asPath);
+          await setLoading(false);
+      } catch (error) {
+          setLoading(false);
+          console.error(error);
+      }
+  }
+
   return (
     <div>
         <input type="text" onChange={(e) => setMahasiswa(e.target.value)}/>
-        <select name="jurusan" id="jurusan" onChange={e => setJurusan(e.target.value)} value={jurusan}>
-            {props.jurusan.map(jurusan => <option key={jurusan.id} value={jurusan.id}>{jurusan.namaJurusan}</option>)}
+        <select name="jurusan" id="jurusan" onChange={jurusanOnChange} defaultValue={props.jurusan[0]??null}>
+            {props.jurusan.map(jurusan2 => <option key={jurusan2.id} value={jurusan2.id}>{jurusan2.namaJurusan}</option>)}
         </select>
         <button onClick={createMahasiswa}>Add mahasiswa</button>
 
@@ -58,13 +91,22 @@ export default function Home(props) {
         <button onClick={() => createJurusan()}>Add Jurusan</button>
         <h1>Mahasiswa</h1>
         <ul>
-            {props.mahasiswa.map(mahasiswa => <li key={mahasiswa.idUser}>{mahasiswa.nama} <a href="#" style={{color: 'blue'}} onClick={() => deleteMahasiswa(mahasiswa.idUser)}>Delete</a></li>)}
+            {props.mahasiswa.map(mahasiswa => <li key={mahasiswa.idUser}>{mahasiswa.nama} - {mahasiswa.jurusan.namaJurusan} <a href="#" style={{color: 'blue'}} onClick={() => deleteMahasiswa(mahasiswa.idUser)}>Delete</a></li>)}
+        </ul>
+
+        <h1>Jurusan</h1>
+        <ul>
+            {props.jurusan.map(jurusan => <li key={jurusan.id}>{jurusan.namaJurusan} <a href="#" style={{color: 'blue'}} onClick={() => deleteJurusan(jurusan.id)}>Delete</a></li>)}
         </ul>
     </div>
   )
 }
 export async function getServerSideProps(context) {
-    const mahasiswa = await prisma.mahasiswa.findMany();
+    const mahasiswa = await prisma.mahasiswa.findMany({
+        include: {
+            jurusan: true
+        }
+    });
     const jurusan = await prisma.jurusan.findMany();
     return {
         props: {
