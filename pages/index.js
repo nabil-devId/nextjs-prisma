@@ -7,9 +7,10 @@ const addMahasiswaFunc = async () => {
 
 }
 export default function Home(props) {
+    console.log(props);
   const [mahasiswa, setMahasiswa] = useState('');
   const router = useRouter();
-  const [jurusan, setJurusan] = useState(props.jurusan[0].id);
+  const [jurusan, setJurusan] = useState(props.jurusan[0]?.id);
   const createMahasiswa = async () =>{
       try {
           await fetch('/api/mahasiswa', {
